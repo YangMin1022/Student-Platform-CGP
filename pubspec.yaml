@@ -1,0 +1,31 @@
+name: flutter_application_1
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.6.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  image_picker: ^1.1.2
+  url_launcher: ^6.1.7 # Add this line
+  fluttertoast: ^8.2.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets\images\the_shipcampus_logo.jpg
+    - assets\images\ship_logo.jpg
+    - assets\images\badminton_tournament.jpg
+    - assets\images\tree_planting_event.jpg
+
+    
+
+  
