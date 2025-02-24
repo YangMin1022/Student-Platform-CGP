@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/event_registration_form.dart';
+import 'package:flutter_application_1/clubs_page.dart'; // Import the new page
 
 class Event {
   final String title;
@@ -79,11 +80,35 @@ class _EventsPageState extends State<EventsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Upcoming Events")),
-      body: ListView.builder(
-        itemCount: events.length,
-        itemBuilder: (context, index) {
-          return EventCard(event: events[index]);
-        },
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: events.length,
+              itemBuilder: (context, index) {
+                return EventCard(event: events[index]);
+              },
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(10),
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ClubsPage()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                    vertical: 15), // Adjust button height
+                textStyle: const TextStyle(fontSize: 18),
+              ),
+              child: const Text("Explore Clubs"),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -237,17 +262,7 @@ class EventDetailsPage extends StatelessWidget {
               const SizedBox(height: 20),
               Center(
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EventRegistrationForm(
-                          eventTitle: event.title,
-                          onRegistered: () {},
-                        ),
-                      ),
-                    );
-                  },
+                  onPressed: () {},
                   child: const Text("Register"),
                 ),
               ),
