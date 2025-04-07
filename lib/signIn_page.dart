@@ -1,214 +1,194 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/signUp_page.dart';
-import 'events_page.dart'; // Import the Events page
+import 'signUp_page.dart';
+import 'events_page.dart'; 
+import 'admin_page.dart';  
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class SignInPage extends StatefulWidget {
+  const SignInPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Student Engagement App',
-      home: SignInPage(),
-    );
-  }
+  State<SignInPage> createState() => _SignInPageState();
 }
 
-class SignInPage extends StatelessWidget {
-  const SignInPage({super.key});
+class _SignInPageState extends State<SignInPage> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  bool isLoading = false;
+
+  Future<void> signIn() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    // Check for the required email domain
+    if (!emailController.text.toLowerCase().endsWith("@peninsulamalaysia.edu.my")) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please use your @peninsulamalaysia.edu.my email.")),
+      );
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      // Sign in with Firebase Authentication
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+      
+      // Retrieve user role from Firestore
+      String uid = userCredential.user!.uid;
+      DocumentSnapshot userDoc = await _firestore.collection("users").doc(uid).get();
+      
+      if (userDoc.exists) {
+        String role = userDoc.get("role");
+        if (role == "admin") {
+          Navigator.pushReplacementNamed(context, '/admin');
+        } else {
+          Navigator.pushReplacementNamed(context, '/events');
+        }
+      } else {
+        throw Exception("User data not found");
+      }
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Sign in error: ${e.message}")),
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Widget _buildInputField({
+    required String title,
+    required String hintText,
+    required TextEditingController controller,
+    bool obscureText = false,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w500)),
+          SizedBox(height: 10),
+          TextFormField(
+            controller: controller,
+            obscureText: obscureText,
+            keyboardType: keyboardType,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return "Please enter $title";
+              }
+              return null;
+            },
+            decoration: InputDecoration(
+              hintText: hintText,
+              hintStyle: TextStyle(color: Colors.grey),
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey),
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.blue),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          // Light Blue Header with Title
-          Container(
-            width: double.infinity,
-            color: Colors.blue[100],
-            padding: EdgeInsets.symmetric(vertical: 20),
-            child: Center(
-              child: Text(
-                'SIGN IN',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
+      body: Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            // Header
+            Container(
+              width: double.infinity,
+              color: Colors.blue[100],
+              padding: EdgeInsets.symmetric(vertical: 20),
+              child: Center(
+                child: Text('SIGN IN', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black)),
               ),
             ),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  SizedBox(height: 20), // Adjusted top spacing
-                  // Logo
-                  Image.asset(
-                    'assets/images/ship_logo.jpg', // Replace with actual path to your logo
-                    width: 200,
-                    height: 200,
-                  ),
-                  SizedBox(height: 5),
-                  // App name
-                  Text(
-                    'Student Engagement App',
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    SizedBox(height: 20),
+                    Image.asset('assets/images/ship_logo.jpg', width: 200, height: 200),
+                    SizedBox(height: 5),
+                    Text('Student Engagement App', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 40),
+                    _buildInputField(
+                      title: 'Student Email Address',
+                      hintText: 'xxxxxxxxxxx@peninsulamalaysia.edu.my',
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
                     ),
-                  ),
-                  SizedBox(height: 40), // Adjusted spacing
-                  // Student Email Address title
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Student Email Address',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  // Student Email Address input field
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'xxxxxxxxxxx@peninsulamalaysia.edu.my',
-                        hintStyle: TextStyle(color: Colors.grey),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Colors.grey), // Gray underline
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(
-                              color:
-                                  Colors.blue), // Blue underline when focused
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  // Password title
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Password',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  // Password input field with lock icon
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: TextField(
+                    SizedBox(height: 20),
+                    _buildInputField(
+                      title: 'Password',
+                      hintText: 'eg: ********',
+                      controller: passwordController,
                       obscureText: true,
-                      decoration: InputDecoration(
-                        hintText: 'eg: ********',
-                        hintStyle: TextStyle(color: Colors.grey),
-                        suffixIcon: Icon(Icons.lock, color: Colors.black),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Colors.grey), // Gray underline
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(
-                              color:
-                                  Colors.blue), // Blue underline when focused
+                    ),
+                    SizedBox(height: 30),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: isLoading ? null : signIn,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            padding: EdgeInsets.symmetric(vertical: 15),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                          ),
+                          child: isLoading
+                              ? CircularProgressIndicator(color: Colors.white)
+                              : Text('SIGN IN', style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold)),
                         ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 30),
-                  // Sign In button
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    EventsPage()), // Navigate to EventsPage
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue, // Button color
-                          padding: EdgeInsets.symmetric(vertical: 15),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5),
+                    SizedBox(height: 20),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("Don't have an account?", style: TextStyle(fontSize: 18)),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => SignUpPage()),
+                              );
+                            },
+                            child: Text('Sign Up', style: TextStyle(fontSize: 18, decoration: TextDecoration.underline, color: Colors.blue)),
                           ),
-                        ),
-                        child: Text(
-                          'SIGN IN',
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        ],
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-          // Bottom Text
-          Padding(
-            padding: EdgeInsets.only(bottom: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Don't have an account?",
-                  style: TextStyle(
-                    fontSize: 18,
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            signUp_page(), // Navigate to Sign Up Page
-                      ),
-                    );
-                  },
-                  child: Text(
-                    'Sign Up',
-                    style: TextStyle(
-                      fontSize: 18,
-                      decoration:
-                          TextDecoration.underline, // Underline the text
-                      color: Colors.blue,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
