@@ -10,6 +10,7 @@ class InsertClubPage extends StatefulWidget {
 
 class _InsertClubPageState extends State<InsertClubPage> {
   // Controllers for text fields
+  final TextEditingController _clubImageUrlController = TextEditingController();
   final TextEditingController _clubNameController = TextEditingController();
   final TextEditingController _clubDescriptionController = TextEditingController();
   final TextEditingController _clubActivitiesController = TextEditingController();
@@ -29,6 +30,7 @@ class _InsertClubPageState extends State<InsertClubPage> {
 
     try {
       await FirebaseFirestore.instance.collection('clubs').add({
+        'clubImageUrl': _clubImageUrlController.text.trim(),
         'clubName': _clubNameController.text.trim(),
         'clubDescription': _clubDescriptionController.text.trim(),
         'clubActivities': _clubActivitiesController.text.trim(),
@@ -46,6 +48,7 @@ class _InsertClubPageState extends State<InsertClubPage> {
       _clubNameController.clear();
       _clubDescriptionController.clear();
       _clubActivitiesController.clear();
+      _clubImageUrlController.clear();
       _picNameController.clear();
       _picContactNumberController.clear();
       _picPositionController.clear();
@@ -71,6 +74,7 @@ class _InsertClubPageState extends State<InsertClubPage> {
         child: ListView(
           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           children: [
+            _buildTextField('Club Image URL', _clubImageUrlController),
             _buildTextField('Club Name', _clubNameController),
             _buildTextField('Club Description', _clubDescriptionController),
             _buildTextField('Club Activities', _clubActivitiesController),
