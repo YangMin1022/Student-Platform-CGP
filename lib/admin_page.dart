@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'insert_event.dart';
 import 'insert_club.dart';
-
+import 'insert_discover.dart';
 class AdminPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -27,6 +27,15 @@ class AdminPage extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => InsertClubPage()),
+              );
+            },
+          ),
+          ElevatedButton(
+            child: Text("Insert Discover"),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => InsertDiscoverPage()),
               );
             },
           ),
