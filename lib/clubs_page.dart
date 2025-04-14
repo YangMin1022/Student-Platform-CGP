@@ -4,7 +4,8 @@ import 'discover_page.dart'; // Import Discover Page
 import 'club_details_page.dart'; // Import Club Details Page
 
 class ClubsPage extends StatefulWidget {
-  const ClubsPage({Key? key}) : super(key: key);
+  final bool isAdmin;
+  const ClubsPage({Key? key, required this.isAdmin}) : super(key: key);
 
   @override
   _ClubsPageState createState() => _ClubsPageState();
@@ -18,11 +19,14 @@ class _ClubsPageState extends State<ClubsPage> {
 
   void _onItemTapped(int index) {
     if (index == 2) {
-      // Navigate to Discover Page when 3rd icon is clicked
+      // For both admin and non-admin, if Discover is tapped (index 2), navigate to DiscoverPage.
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const DiscoverPage()),
       );
+    } else if (widget.isAdmin && index == 3) {
+      // If admin taps the Admin navigation item (index 3), navigate to AdminPage.
+      Navigator.pushNamed(context, '/admin');
     } else {
       setState(() {
         _selectedIndex = index;
@@ -138,15 +142,20 @@ class _ClubsPageState extends State<ClubsPage> {
         unselectedItemColor: Colors.black54,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_today), label: "Calendar"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.public),
-              label: "Discover"), // Navigate to DiscoverPage
-          BottomNavigationBarItem(icon: Icon(Icons.menu), label: "Menu"),
-        ],
+        items: widget.isAdmin
+            ? const [
+                BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+                BottomNavigationBarItem(icon: Icon(Icons.event), label: "Events"),
+                BottomNavigationBarItem(icon: Icon(Icons.public), label: "Discover"),
+                BottomNavigationBarItem(icon: Icon(Icons.admin_panel_settings), label: "Admin"),
+                BottomNavigationBarItem(icon: Icon(Icons.menu), label: "Menu"),
+              ]
+            : const [
+                BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+                BottomNavigationBarItem(icon: Icon(Icons.event), label: "Events"),
+                BottomNavigationBarItem(icon: Icon(Icons.public), label: "Discover"),
+                BottomNavigationBarItem(icon: Icon(Icons.menu), label: "Menu"),
+              ],
       ),
     );
   }

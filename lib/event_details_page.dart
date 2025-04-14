@@ -37,7 +37,7 @@ class EventDetailsPage extends StatelessWidget {
               // Event cover image
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
-                child: Image.asset(
+                child: Image.network(
                   event.imageUrl,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {

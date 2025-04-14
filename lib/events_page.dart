@@ -44,7 +44,7 @@ class Event {
       time: data['eventTime'] ?? '',
       organizer: data['eventOrganizer'] ?? '',
       location: data['eventVenue'] ?? '',
-      imageUrl: data['eventCoverPic'] ?? 'assets/images/badminton_tournament.jpg',
+      imageUrl: data['eventCoverPic'] ?? '',
       registrationUrl: data['googleFormLink'] ?? '',
       description: data['eventDescription'] ?? '',
       eventFee: data['eventFee'] ?? 'N/A',
@@ -57,7 +57,8 @@ class Event {
 }
 
 class EventsPage extends StatefulWidget {
-  const EventsPage({super.key});
+  final bool isAdmin;
+  const EventsPage({super.key, required this.isAdmin});
 
   @override
   _EventsPageState createState() => _EventsPageState();
@@ -101,7 +102,7 @@ class _EventsPageState extends State<EventsPage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ClubsPage()),
+                  MaterialPageRoute(builder: (context) => ClubsPage(isAdmin: widget.isAdmin)),
                 );
               },
               style: ElevatedButton.styleFrom(
@@ -132,7 +133,7 @@ class EventCard extends StatelessWidget {
           // Display event cover image
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
-            child: Image.asset(
+            child: Image.network(
               event.imageUrl,
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
