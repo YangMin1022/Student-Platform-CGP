@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'signUp_page.dart';
 import 'events_page.dart'; 
-import 'admin_page.dart';  
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -47,16 +46,21 @@ class _SignInPageState extends State<SignInPage> {
       String uid = userCredential.user!.uid;
       DocumentSnapshot userDoc = await _firestore.collection("users").doc(uid).get();
       
+      bool isAdmin = false;
       if (userDoc.exists) {
         String role = userDoc.get("role");
-        if (role == "admin") {
-          Navigator.pushReplacementNamed(context, '/admin');
-        } else {
-          Navigator.pushReplacementNamed(context, '/events');
-        }
+        isAdmin = role.toLowerCase() == "admin";
       } else {
         throw Exception("User data not found");
       }
+      
+      // Navigate to EventsPage, passing the isAdmin flag
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => EventsPage(isAdmin: isAdmin),
+        ),
+      );
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Sign in error: ${e.message}")),

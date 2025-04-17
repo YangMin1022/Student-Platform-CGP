@@ -1,7 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'signIn_page.dart';
-import 'events_page.dart';
 import 'admin_page.dart';
 import 'signup_page.dart';
 
@@ -22,9 +21,9 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: SignInPage(),
       routes: {
-        '/events': (context) => EventsPage(), 
+        '/signin': (context) => const SignInPage(),
         '/admin': (context) => AdminPage(),   
-        '/signup': (context) => SignUpPage(),
+        '/signup': (context) => const SignUpPage(),
       },
     );
   }
