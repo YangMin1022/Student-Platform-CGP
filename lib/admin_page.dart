@@ -3,10 +3,15 @@ import 'insert_event.dart';
 import 'insert_club.dart';
 import 'insert_discover.dart';
 class AdminPage extends StatelessWidget {
+  final String role;
+  const AdminPage({Key? key, required this.role}) : super(key: key);
+
+  bool get isSystemAdmin => role == 'admin';
+  bool get isClubAdmin   => role == 'clubAdmin';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Admin Page")),
     body: Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -21,15 +26,14 @@ class AdminPage extends StatelessWidget {
               );
             },
           ),
-          ElevatedButton(
-            child: Text("Insert Club"),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => InsertClubPage()),
-              );
-            },
-          ),
+          if (isSystemAdmin)
+              ElevatedButton(
+                child: const Text("Insert Club"),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => InsertClubPage()),
+                ),
+              ),
           ElevatedButton(
             child: Text("Insert Discover"),
             onPressed: () {

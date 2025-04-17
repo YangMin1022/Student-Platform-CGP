@@ -46,19 +46,23 @@ class _SignInPageState extends State<SignInPage> {
       String uid = userCredential.user!.uid;
       DocumentSnapshot userDoc = await _firestore.collection("users").doc(uid).get();
       
-      bool isAdmin = false;
-      if (userDoc.exists) {
-        String role = userDoc.get("role");
-        isAdmin = role.toLowerCase() == "admin";
-      } else {
-        throw Exception("User data not found");
+       if (!userDoc.exists) {
+        throw Exception("User record not found");
       }
+      String role = userDoc.get('role') as String;
+      // bool isAdmin = false;
+      // if (userDoc.exists) {
+      //   String role = userDoc.get("role");
+      //   isAdmin = role.toLowerCase() == "admin";
+      // } else {
+      //   throw Exception("User data not found");
+      // }
       
       // Navigate to EventsPage, passing the isAdmin flag
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => EventsPage(isAdmin: isAdmin),
+          builder: (context) => EventsPage(role: role),
         ),
       );
     } on FirebaseAuthException catch (e) {

@@ -52,15 +52,6 @@ class _DiscoverPageState extends State<DiscoverPage> {
     }).toList();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Discover",
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black),
-        ),
-        backgroundColor: Colors.white,
-        iconTheme: const IconThemeData(color: Colors.black),
-        elevation: 1,
-      ),
       body: Padding(
         padding: const EdgeInsets.all(10),
         child: Column(

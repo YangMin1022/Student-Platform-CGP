@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class InsertDiscoverPage extends StatefulWidget {
   const InsertDiscoverPage({Key? key}) : super(key: key);
@@ -30,6 +31,7 @@ class _InsertDiscoverPageState extends State<InsertDiscoverPage> {
         return {
           'clubId': doc.id,
           'clubName': data['clubName'] ?? 'Unnamed Club',
+          'presidentEmail': data['presidentEmail'] ?? '', // Make sure each club doc has this field.
         };
       }).toList();
     });
@@ -44,6 +46,36 @@ class _InsertDiscoverPageState extends State<InsertDiscoverPage> {
   Future<void> _submitDiscover() async {
     if (!_formKey.currentState!.validate() || _selectedClubId == null) return;
 
+    // Get current user email
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("User is not signed in.")),
+      );
+      return;
+    }
+    String currentUserEmail = currentUser.email ?? '';
+
+    // Retrieve the club document to check the president's email.
+    DocumentSnapshot clubDoc = await FirebaseFirestore.instance.collection('clubs').doc(_selectedClubId).get();
+    if (!clubDoc.exists) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Selected club not found.")),
+      );
+      return;
+    }
+    String clubPresidentEmail = clubDoc.get('presidentEmail'); // Ensure this field exists.
+    
+    // For non-admins: check if current user's email matches the club president email.
+    // (You may want to add additional logic if you maintain an admin flag as well.)
+    // In this example, we assume that only the club president (or admin) can submit.
+    if (currentUserEmail.toLowerCase() != clubPresidentEmail.toLowerCase()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Only the club president can add a discover post for this club.")),
+      );
+      return;
+    }
+    
     setState(() {
       _isSubmitting = true;
     });

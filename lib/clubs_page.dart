@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'discover_page.dart'; // Import Discover Page
 import 'club_details_page.dart'; // Import Club Details Page
+import 'admin_page.dart';
+import 'signedInEvent_page.dart';
 
 class ClubsPage extends StatefulWidget {
-  final bool isAdmin;
-  const ClubsPage({Key? key, required this.isAdmin}) : super(key: key);
+  final String role; // Role of the user (admin or non-admin)
+  // final bool isAdmin;
+  const ClubsPage({Key? key, required this.role}) : super(key: key);
 
   @override
   _ClubsPageState createState() => _ClubsPageState();
@@ -15,148 +18,142 @@ class _ClubsPageState extends State<ClubsPage> {
   TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
+  bool get isAdminTabVisible => widget.role == 'admin' || widget.role == 'clubAdmin';
+
   int _selectedIndex = 0; // Default selected tab (Home)
 
   void _onItemTapped(int index) {
-    if (index == 2) {
-      // For both admin and non-admin, if Discover is tapped (index 2), navigate to DiscoverPage.
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const DiscoverPage()),
-      );
-    } else if (widget.isAdmin && index == 3) {
-      // If admin taps the Admin navigation item (index 3), navigate to AdminPage.
-      Navigator.pushNamed(context, '/admin');
-    } else {
-      setState(() {
-        _selectedIndex = index;
-      });
-    }
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
-  // void _navigateToClubDetails(
-  //     String clubName, String description, String imagePath, String activities, String picName, String picContact, String picPosition) {
-  //   Navigator.push(
-  //     context,
-  //     MaterialPageRoute(
-  //       builder: (context) => ClubDetailsPage(
-  //         clubName: clubName,
-  //         description: description,
-  //         imagePath: imagePath,
-  //         activities: activities,
-  //         picName: picName,
-  //         picContact: picContact,
-  //         picPosition: picPosition,
-  //       ),
-  //     ),
-  //   );
-  // }
+  String _getAppBarTitle(int index) {
+  switch (index) {
+    case 0:
+      return 'Clubs';
+    case 1:
+      return 'Events';
+    case 2:
+      return 'Discover';
+    case 3:
+      return 'Admin Panel';
+    default:
+      return 'App';
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> pages = [
+      buildClubList(), // Home/Clubs
+      SignedInEventsPage(role: widget.role), // Events
+      const DiscoverPage(), // Discover
+      if (isAdminTabVisible) AdminPage(role: widget.role), // Admin
+    ];
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 1,
-        title: const Text(
-          "Club",
+        title: Text(
+          _getAppBarTitle(_selectedIndex),
           style: TextStyle(
               color: Colors.black, fontSize: 22, fontWeight: FontWeight.bold),
         ),
-        actions: [
-          IconButton(
-            icon:
-                const Icon(Icons.account_circle, color: Colors.black, size: 30),
-            onPressed: () {},
-          ),
+        actions: const [
+          Icon(Icons.account_circle, color: Colors.black, size: 30),
         ],
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search Club',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value.toLowerCase();
-                });
-              },
-            ),
-          ),
-          Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance.collection('clubs').snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return const Center(child: Text("No clubs found"));
-                }
-
-                final clubs = snapshot.data!.docs.where((doc) {
-                  final data = doc.data() as Map<String, dynamic>;
-                  final name = data['clubName']?.toLowerCase() ?? '';
-                  final desc = data['clubDescription']?.toLowerCase() ?? '';
-                  return name.contains(_searchQuery) || desc.contains(_searchQuery);
-                }).toList();
-
-                if (clubs.isEmpty) {
-                  return const Center(child: Text("No matching clubs found"));
-                }
-
-                return ListView.builder(
-                  itemCount: clubs.length,
-                  itemBuilder: (context, index) {
-                    final data = clubs[index].data() as Map<String, dynamic>;
-                    return _buildClubCard(
-                      clubName: data['clubName'] ?? '',
-                      description: data['clubDescription'] ?? '',
-                      imagePath: data['clubImageUrl'] ?? '',
-                      activities: data['clubActivities'] ?? '',
-                      picName: data['picName'] ?? '',
-                      picContact: data['picContactNumber'] ?? '',
-                      picPosition: data['picPosition'] ?? '',
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-        ],
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: pages,
       ),
-
-
-      // Bottom Navigation Bar
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Colors.black,
         unselectedItemColor: Colors.black54,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        items: widget.isAdmin
+        items: isAdminTabVisible
             ? const [
                 BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
                 BottomNavigationBarItem(icon: Icon(Icons.event), label: "Events"),
                 BottomNavigationBarItem(icon: Icon(Icons.public), label: "Discover"),
                 BottomNavigationBarItem(icon: Icon(Icons.admin_panel_settings), label: "Admin"),
-                BottomNavigationBarItem(icon: Icon(Icons.menu), label: "Menu"),
               ]
             : const [
                 BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
                 BottomNavigationBarItem(icon: Icon(Icons.event), label: "Events"),
                 BottomNavigationBarItem(icon: Icon(Icons.public), label: "Discover"),
-                BottomNavigationBarItem(icon: Icon(Icons.menu), label: "Menu"),
               ],
       ),
+    );
+  }
+
+  Widget buildClubList() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(10),
+          child: TextField(
+            controller: _searchController,
+            decoration: InputDecoration(
+              hintText: 'Search Club',
+              prefixIcon: const Icon(Icons.search),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            ),
+            onChanged: (value) {
+              setState(() {
+                _searchQuery = value.toLowerCase();
+              });
+            },
+          ),
+        ),
+        Expanded(
+          child: StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance.collection('clubs').snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                return const Center(child: Text("No clubs found"));
+              }
+
+              final clubs = snapshot.data!.docs.where((doc) {
+                final data = doc.data() as Map<String, dynamic>;
+                final name = data['clubName']?.toLowerCase() ?? '';
+                final desc = data['clubDescription']?.toLowerCase() ?? '';
+                return name.contains(_searchQuery) || desc.contains(_searchQuery);
+              }).toList();
+
+              if (clubs.isEmpty) {
+                return const Center(child: Text("No matching clubs found"));
+              }
+
+              return ListView.builder(
+                itemCount: clubs.length,
+                itemBuilder: (context, index) {
+                  final data = clubs[index].data() as Map<String, dynamic>;
+                  return _buildClubCard(
+                    clubName: data['clubName'] ?? '',
+                    description: data['clubDescription'] ?? '',
+                    imagePath: data['clubImageUrl'] ?? '',
+                    activities: data['clubActivities'] ?? '',
+                    picName: data['picName'] ?? '',
+                    picContact: data['picContactNumber'] ?? '',
+                    picPosition: data['picPosition'] ?? '',
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 

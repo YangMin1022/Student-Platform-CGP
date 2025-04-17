@@ -1,119 +1,50 @@
+// lib/signedInevent_page.dart
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'models/event.dart';               // <- import the model
 import 'event_details_page.dart';
 import 'event_registration_form.dart';
-import 'clubs_page.dart';
-import 'models/event.dart';
 
-// Event model class (optional: you can work directly with Map<String, dynamic>)
-// class Event {
-//   final String title;
-//   final String date;
-//   final String time;
-//   final String organizer;
-//   final String location;
-//   final String imageUrl;
-//   final String registrationUrl;
-//   final String description;
-//   final String eventFee;
-//   final String eventTransportation;
-//   final String eventCategory;
-//   final String googleFormLink;
-//   final String numParticipant;
-
-//   Event({
-//     required this.title,
-//     required this.date,
-//     required this.time,
-//     required this.organizer,
-//     required this.location,
-//     required this.imageUrl,
-//     required this.registrationUrl,
-//     required this.description,
-//     required this.eventFee,
-//     required this.eventTransportation,
-//     required this.eventCategory,
-//     required this.googleFormLink,
-//     required this.numParticipant,
-//   });
-
-//   factory Event.fromFirestore(DocumentSnapshot doc) {
-//     Map data = doc.data() as Map<String, dynamic>;
-//     return Event(
-//       title: data['eventName'] ?? 'No Title',
-//       date: data['eventDate'] ?? 'No Date',
-//       time: data['eventTime'] ?? '',
-//       organizer: data['eventOrganizer'] ?? '',
-//       location: data['eventVenue'] ?? '',
-//       imageUrl: data['eventCoverPic'] ?? '',
-//       registrationUrl: data['googleFormLink'] ?? '',
-//       description: data['eventDescription'] ?? '',
-//       eventFee: data['eventFee'] ?? 'N/A',
-//       eventTransportation: data['eventTransportation'] ?? 'N/A',
-//       eventCategory: data['eventCategory'] ?? 'N/A',
-//       googleFormLink: data['googleFormLink'] ?? 'N/A',
-//       numParticipant: data['numParticipants'] ?? 'N/A',
-//     );
-//   }
-// }
-
-class EventsPage extends StatefulWidget {
+class SignedInEventsPage extends StatefulWidget {
   final String role;
-  // final bool isAdmin;
-  const EventsPage({super.key, required this.role});
+  const SignedInEventsPage({Key? key, required this.role}) : super(key: key);
 
   @override
-  _EventsPageState createState() => _EventsPageState();
+  _SignedInEventsPageState createState() => _SignedInEventsPageState();
 }
 
-class _EventsPageState extends State<EventsPage> {
+class _SignedInEventsPageState extends State<SignedInEventsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Upcoming Events")),
       body: Column(
         children: [
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
+              // This will pull every doc in every "events" subcollection under clubs/*
               stream: FirebaseFirestore.instance
                   .collectionGroup('events')
                   .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+              builder: (context, snap) {
+                if (snap.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
                 }
-                if (snapshot.hasError) {
-                  return Center(child: Text("Error: ${snapshot.error}"));
+                if (snap.hasError) {
+                  return Center(child: Text('Error: ${snap.error}'));
                 }
-                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return Center(child: Text("No events available"));
+                final docs = snap.data!.docs;
+                if (docs.isEmpty) {
+                  return const Center(child: Text('No events available.'));
                 }
-                final eventsDocs = snapshot.data!.docs;
+                final events =
+                    docs.map((d) => Event.fromFirestore(d)).toList();
+
                 return ListView.builder(
-                  itemCount: eventsDocs.length,
-                  itemBuilder: (context, index) {
-                    Event event = Event.fromFirestore(eventsDocs[index]);
-                    return EventCard(event: event);
-                  },
+                  itemCount: events.length,
+                  itemBuilder: (_, i) => EventCard(event: events[i]),
                 );
               },
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.all(10),
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ClubsPage(role: widget.role)),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 15),
-                textStyle: const TextStyle(fontSize: 18),
-              ),
-              child: const Text("Explore Clubs"),
             ),
           ),
         ],
@@ -124,9 +55,9 @@ class _EventsPageState extends State<EventsPage> {
 
 class EventCard extends StatelessWidget {
   final Event event;
+  const EventCard({Key? key, required this.event}) : super(key: key);
 
-  const EventCard({super.key, required this.event});
-
+  
   @override
   Widget build(BuildContext context) {
     return Card(

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'events_page.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -63,12 +64,19 @@ class _SignUpPageState extends State<SignUpPage> {
         "role": role,
       });
 
-      // Navigate based on role
+      // bool isAdmin;
+      String roles;
       if (role == "admin") {
-        Navigator.pushReplacementNamed(context, '/admin');
+        roles = "admin";
       } else {
-        Navigator.pushReplacementNamed(context, '/events');
+        roles = "student";
       }
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => EventsPage(role: roles),
+        ),
+      );
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Sign up error: ${e.message}")),
