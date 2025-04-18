@@ -232,20 +232,42 @@ class _ClubsPageState extends State<ClubsPage> {
                       child: const Text("More Info",
                           style: TextStyle(color: Colors.white)),
                     ),
-                    OutlinedButton(
-                      onPressed: () {
-                        Navigator.push(
-                         context,
-                         MaterialPageRoute(
-                          builder: (_) => ClubRegistrationPage(
-                            clubId: clubId,
-                            clubName: clubName,
+                    StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('clubs')
+                          .doc(clubId)
+                          .collection('registrations')
+                          .where('studentEmail', isEqualTo: currentEmail)
+                          .snapshots(),
+                      builder: (context, snap) {
+                        if (snap.connectionState == ConnectionState.waiting) {
+                          return const CircularProgressIndicator();
+                        }
+                        if (snap.hasError) {
+                          return Text('Error');
+                        }
+                        final already = snap.data!.docs.isNotEmpty;
+
+                        return ElevatedButton(
+                          onPressed: already
+                              ? null
+                              : () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => ClubRegistrationPage(
+                                        clubId: clubId,
+                                        clubName: clubName,
+                                      ),
+                                    ),
+                                  );
+                                },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: already ? Colors.grey : Colors.white,
                           ),
-                        ),
-                      );
+                          child: Text(already ? 'Registered' : 'Register'),
+                        );
                       },
-                      child: const Text("Register",
-                          style: TextStyle(color: Colors.black)),
                     ),
                   ],
                 ),

@@ -24,12 +24,9 @@ class _SignInPageState extends State<SignInPage> {
     if (!_formKey.currentState!.validate()) return;
 
     // Check for the required email domain
-    if (!emailController.text
-        .toLowerCase()
-        .endsWith("@peninsulamalaysia.edu.my")) {
+    if (!emailController.text.toLowerCase().endsWith("@peninsulamalaysia.edu.my")) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text("Please use your @peninsulamalaysia.edu.my email.")),
+        SnackBar(content: Text("Please use your @peninsulamalaysia.edu.my email.")),
       );
       return;
     }
@@ -47,8 +44,7 @@ class _SignInPageState extends State<SignInPage> {
 
       // Retrieve user role from Firestore
       String uid = userCredential.user!.uid;
-      DocumentSnapshot userDoc =
-          await _firestore.collection("users").doc(uid).get();
+      DocumentSnapshot userDoc = await _firestore.collection("users").doc(uid).get();
 
       if (!userDoc.exists) {
         throw Exception("User record not found");
@@ -92,11 +88,7 @@ class _SignInPageState extends State<SignInPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title,
-              style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w500)),
+          Text(title,style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w500)),
           SizedBox(height: 10),
           TextFormField(
             controller: controller,
@@ -137,11 +129,7 @@ class _SignInPageState extends State<SignInPage> {
               color: Colors.blue[100],
               padding: EdgeInsets.symmetric(vertical: 20),
               child: Center(
-                child: Text('SIGN IN',
-                    style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black)),
+                child: Text('SIGN IN', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black)),
               ),
             ),
             Expanded(
@@ -149,12 +137,9 @@ class _SignInPageState extends State<SignInPage> {
                 child: Column(
                   children: [
                     SizedBox(height: 20),
-                    Image.asset('assets/images/ship_logo.jpg',
-                        width: 200, height: 200),
+                    Image.asset('assets/images/ship_logo.jpg', width: 200, height: 200),
                     SizedBox(height: 5),
-                    Text('Student Engagement App',
-                        style: TextStyle(
-                            fontSize: 26, fontWeight: FontWeight.bold)),
+                    Text('Student Engagement App', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
                     SizedBox(height: 40),
                     _buildInputField(
                       title: 'Student Email Address',
@@ -179,16 +164,11 @@ class _SignInPageState extends State<SignInPage> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue,
                             padding: EdgeInsets.symmetric(vertical: 15),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
                           ),
                           child: isLoading
                               ? CircularProgressIndicator(color: Colors.white)
-                              : Text('SIGN IN',
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold)),
+                              : Text('SIGN IN',style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold)),
                         ),
                       ),
                     ),
@@ -198,21 +178,15 @@ class _SignInPageState extends State<SignInPage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("Don't have an account?",
-                              style: TextStyle(fontSize: 18)),
+                          Text("Don't have an account?", style: TextStyle(fontSize: 18)),
                           TextButton(
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(
-                                    builder: (context) => SignUpPage()),
+                                MaterialPageRoute(builder: (context) => SignUpPage()),
                               );
                             },
-                            child: Text('Sign Up',
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    decoration: TextDecoration.underline,
-                                    color: Colors.blue)),
+                            child: Text('Sign Up', style: TextStyle(fontSize: 18, decoration: TextDecoration.underline, color: Colors.blue)),
                           ),
                         ],
                       ),
