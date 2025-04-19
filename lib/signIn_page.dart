@@ -50,13 +50,6 @@ class _SignInPageState extends State<SignInPage> {
         throw Exception("User record not found");
       }
       String role = userDoc.get('role') as String;
-      // bool isAdmin = false;
-      // if (userDoc.exists) {
-      //   String role = userDoc.get("role");
-      //   isAdmin = role.toLowerCase() == "admin";
-      // } else {
-      //   throw Exception("User data not found");
-      // }
 
       // Navigate to EventsPage, passing the isAdmin flag
       Navigator.pushReplacement(
@@ -173,20 +166,38 @@ class _SignInPageState extends State<SignInPage> {
                       ),
                     ),
                     SizedBox(height: 20),
+                    // at the bottom of your Column in build():
                     Padding(
                       padding: EdgeInsets.only(bottom: 20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      child: Column(
                         children: [
-                          Text("Don't have an account?", style: TextStyle(fontSize: 18)),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text("Don't have an account?", style: TextStyle(fontSize: 18)),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => SignUpPage()),
+                                  );
+                                },
+                                child: Text('Sign Up', style: TextStyle(fontSize: 18, decoration: TextDecoration.underline, color: Colors.blue)),
+                              ),
+                            ],
+                          ),
+                          // ←–– New guest link below
                           TextButton(
                             onPressed: () {
-                              Navigator.push(
+                              Navigator.pushReplacement(
                                 context,
-                                MaterialPageRoute(builder: (context) => SignUpPage()),
+                                MaterialPageRoute(
+                                  builder: (_) => EventsPage(role: 'guest'),
+                                ),
                               );
                             },
-                            child: Text('Sign Up', style: TextStyle(fontSize: 18, decoration: TextDecoration.underline, color: Colors.blue)),
+                            child: Text('Continue as Guest', style: TextStyle(fontSize: 16, decoration: TextDecoration.underline, color: Colors.grey[700]),
+                            ),
                           ),
                         ],
                       ),

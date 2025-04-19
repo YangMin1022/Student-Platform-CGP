@@ -42,7 +42,7 @@ class _SignedInEventsPageState extends State<SignedInEventsPage> {
 
                 return ListView.builder(
                   itemCount: events.length,
-                  itemBuilder: (_, i) => EventCard(event: events[i]),
+                  itemBuilder: (_, i) => EventCard(event: events[i], role: widget.role),
                 );
               },
             ),
@@ -55,11 +55,13 @@ class _SignedInEventsPageState extends State<SignedInEventsPage> {
 
 class EventCard extends StatelessWidget {
   final Event event;
-  const EventCard({Key? key, required this.event}) : super(key: key);
+  final String role;
+  const EventCard({Key? key, required this.event, required this.role}) : super(key: key);
 
   
   @override
   Widget build(BuildContext context) {
+    final isGuest = role == 'guest';
     return Card(
       margin: const EdgeInsets.all(10),
       child: Column(
@@ -105,7 +107,7 @@ class EventCard extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => EventDetailsPage(event: event),
+                            builder: (context) => EventDetailsPage(event: event, role: role),
                           ),
                         );
                       },
@@ -113,20 +115,25 @@ class EventCard extends StatelessWidget {
                     ),
                     // Register Button
                     ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EventRegistrationForm(
-                              eventTitle: event.title,
-                              onRegistered: () {
-                                // Optionally update registration status
-                              },
-                            ),
-                          ),
-                        );
-                      },
-                      child: const Text("Register"),
+                      onPressed: isGuest
+                          ? null
+                          : () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      EventRegistrationForm(
+                                        eventTitle: event.title,
+                                        onRegistered: () {},
+                                      ),
+                                ),
+                              );
+                            },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            isGuest ? Colors.grey : null,
+                      ),
+                      child: Text(isGuest ? "Login to Register" : "Register"),
                     ),
                   ],
                 ),

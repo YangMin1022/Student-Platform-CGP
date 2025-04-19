@@ -47,7 +47,6 @@ class _ClubsPageState extends State<ClubsPage> {
   }
 }
 
-
   @override
   Widget build(BuildContext context) {
     final List<Widget> pages = [
@@ -178,6 +177,7 @@ class _ClubsPageState extends State<ClubsPage> {
     final currentEmail = FirebaseAuth.instance.currentUser?.email?.toLowerCase();
     final isAdmin        = widget.role == 'admin';
     final isClubAdmin    = presidentEmail?.toLowerCase() == currentEmail;
+    final isGuest     = widget.role == 'guest';
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -247,9 +247,12 @@ class _ClubsPageState extends State<ClubsPage> {
                           return Text('Error');
                         }
                         final already = snap.data!.docs.isNotEmpty;
+                        final btnLabel = isGuest
+                            ? 'Login to Register'
+                            : (already ? 'Registered' : 'Register');
 
                         return ElevatedButton(
-                          onPressed: already
+                          onPressed: (already || isGuest)
                               ? null
                               : () {
                                   Navigator.push(
@@ -263,9 +266,9 @@ class _ClubsPageState extends State<ClubsPage> {
                                   );
                                 },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: already ? Colors.grey : Colors.white,
+                            backgroundColor: (already || isGuest) ? Colors.grey : Colors.white,
                           ),
-                          child: Text(already ? 'Registered' : 'Register'),
+                          child: Text(btnLabel, style: TextStyle(color: (already || isGuest) ? Colors.black38 : Colors.black)),
                         );
                       },
                     ),

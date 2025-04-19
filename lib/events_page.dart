@@ -5,57 +5,6 @@ import 'event_registration_form.dart';
 import 'clubs_page.dart';
 import 'models/event.dart';
 
-// Event model class (optional: you can work directly with Map<String, dynamic>)
-// class Event {
-//   final String title;
-//   final String date;
-//   final String time;
-//   final String organizer;
-//   final String location;
-//   final String imageUrl;
-//   final String registrationUrl;
-//   final String description;
-//   final String eventFee;
-//   final String eventTransportation;
-//   final String eventCategory;
-//   final String googleFormLink;
-//   final String numParticipant;
-
-//   Event({
-//     required this.title,
-//     required this.date,
-//     required this.time,
-//     required this.organizer,
-//     required this.location,
-//     required this.imageUrl,
-//     required this.registrationUrl,
-//     required this.description,
-//     required this.eventFee,
-//     required this.eventTransportation,
-//     required this.eventCategory,
-//     required this.googleFormLink,
-//     required this.numParticipant,
-//   });
-
-//   factory Event.fromFirestore(DocumentSnapshot doc) {
-//     Map data = doc.data() as Map<String, dynamic>;
-//     return Event(
-//       title: data['eventName'] ?? 'No Title',
-//       date: data['eventDate'] ?? 'No Date',
-//       time: data['eventTime'] ?? '',
-//       organizer: data['eventOrganizer'] ?? '',
-//       location: data['eventVenue'] ?? '',
-//       imageUrl: data['eventCoverPic'] ?? '',
-//       registrationUrl: data['googleFormLink'] ?? '',
-//       description: data['eventDescription'] ?? '',
-//       eventFee: data['eventFee'] ?? 'N/A',
-//       eventTransportation: data['eventTransportation'] ?? 'N/A',
-//       eventCategory: data['eventCategory'] ?? 'N/A',
-//       googleFormLink: data['googleFormLink'] ?? 'N/A',
-//       numParticipant: data['numParticipants'] ?? 'N/A',
-//     );
-//   }
-// }
 
 class EventsPage extends StatefulWidget {
   final String role;
@@ -93,7 +42,7 @@ class _EventsPageState extends State<EventsPage> {
                   itemCount: eventsDocs.length,
                   itemBuilder: (context, index) {
                     Event event = Event.fromFirestore(eventsDocs[index]);
-                    return EventCard(event: event);
+                    return EventCard(event: event, role: widget.role);
                   },
                 );
               },
@@ -124,11 +73,13 @@ class _EventsPageState extends State<EventsPage> {
 
 class EventCard extends StatelessWidget {
   final Event event;
-
-  const EventCard({super.key, required this.event});
+  final String role;
+  const EventCard({super.key, required this.event, required this.role});
 
   @override
   Widget build(BuildContext context) {
+    final bool isGuest = role == 'guest';
+
     return Card(
       margin: const EdgeInsets.all(10),
       child: Column(
@@ -174,28 +125,33 @@ class EventCard extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => EventDetailsPage(event: event),
+                            builder: (context) => EventDetailsPage(event: event, role: role),
                           ),
                         );
                       },
                       child: const Text("More Info"),
                     ),
-                    // Register Button
+                    // Register is disabled for guests
                     ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EventRegistrationForm(
-                              eventTitle: event.title,
-                              onRegistered: () {
-                                // Optionally update registration status
-                              },
-                            ),
-                          ),
-                        );
-                      },
-                      child: const Text("Register"),
+                      onPressed: isGuest
+                          ? null
+                          : () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      EventRegistrationForm(
+                                        eventTitle: event.title,
+                                        onRegistered: () {},
+                                      ),
+                                ),
+                              );
+                            },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            isGuest ? Colors.grey : null,
+                      ),
+                      child: Text(isGuest ? "Login to Register" : "Register"),
                     ),
                   ],
                 ),

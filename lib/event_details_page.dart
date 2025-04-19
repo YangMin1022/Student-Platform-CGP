@@ -4,8 +4,8 @@ import 'event_registration_form.dart';
 
 class EventDetailsPage extends StatelessWidget {
   final Event event;
-
-  const EventDetailsPage({super.key, required this.event});
+  final String role;
+  const EventDetailsPage({super.key, required this.event, required this.role});
 
   Widget _buildDetailRow(IconData icon, String label, String value) {
     return Padding(
@@ -26,6 +26,8 @@ class EventDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isGuest = role == 'guest';
+
     return Scaffold(
       appBar: AppBar(title: Text(event.title)),
       body: Padding(
@@ -77,7 +79,9 @@ class EventDetailsPage extends StatelessWidget {
               // Register Button
               Center(
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: isGuest
+                  ? null
+                  : () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -90,7 +94,11 @@ class EventDetailsPage extends StatelessWidget {
                       ),
                     );
                   },
-                  child: const Text("Register"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        isGuest ? Colors.grey : Theme.of(context).primaryColor,
+                  ),
+                  child: Text(isGuest ? "Login to Register" : "Register",style: TextStyle(color: isGuest ? Colors.black38 : Colors.white,),),
                 ),
               ),
             ],
