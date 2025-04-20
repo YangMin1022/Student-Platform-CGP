@@ -1,7 +1,6 @@
 // main.dart
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'dart:math'; // For the circle animation
 
 import 'signIn_page.dart';
 import 'signup_page.dart';
