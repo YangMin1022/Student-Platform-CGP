@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class ClubDetailsPage extends StatelessWidget {
@@ -33,8 +34,20 @@ class ClubDetailsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.network(imagePath,
-                width: double.infinity, height: 200, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image, size: 100),),
+            CachedNetworkImage(
+              imageUrl: imagePath,
+              width: double.infinity,
+              height: 240,
+              fit: BoxFit.cover,
+              placeholder: (ctx, url) => Container(
+                width: double.infinity,
+                height: 240,
+                alignment: Alignment.center,
+                child: const CircularProgressIndicator(strokeWidth: 2),
+              ),
+              errorWidget: (ctx, url, error) => const Icon(Icons.broken_image, size: 50),
+            ),
+            // Image.network(imagePath, width: double.infinity, height: 200, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image, size: 100),),
             const SizedBox(height: 15),
             Text(clubName,
                 style:

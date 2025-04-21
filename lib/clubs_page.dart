@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'discover_page.dart'; // Import Discover Page
 import 'club_details_page.dart'; // Import Club Details Page
 import 'admin_page.dart';
@@ -189,8 +190,20 @@ class _ClubsPageState extends State<ClubsPage> {
           // Club Image
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-            child: Image.network(imagePath,
-                width: double.infinity, height: 150, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),),
+            child: CachedNetworkImage(
+              imageUrl: imagePath,
+              width: double.infinity,
+              height: 240,
+              fit: BoxFit.cover,
+              placeholder: (ctx, url) => Container(
+                width: double.infinity,
+                height: 240,
+                alignment: Alignment.center,
+                child: const CircularProgressIndicator(strokeWidth: 2),
+              ),
+              errorWidget: (ctx, url, error) => const Icon(Icons.broken_image, size: 50),
+            ),
+            // Image.network(imagePath, width: double.infinity, height: 150, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),),
           ),
           Padding(
             padding: const EdgeInsets.all(10),

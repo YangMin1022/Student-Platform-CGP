@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -52,7 +53,9 @@ class _DiscoverPageState extends State<DiscoverPage> {
     }).toList();
 
     return Scaffold(
-      body: Padding(
+      body: RefreshIndicator(
+      onRefresh: _fetchDiscoverData,
+      child: Padding(
         padding: const EdgeInsets.all(10),
         child: Column(
           children: [
@@ -90,15 +93,25 @@ class _DiscoverPageState extends State<DiscoverPage> {
                             children: [
                               if (item['discoverImageUrl'] != null && item['discoverImageUrl'].toString().isNotEmpty)
                                 ClipRRect(
-                                  borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-                                  child: Image.network(
-                                    item['discoverImageUrl'],
-                                    height: 180,
+                                  borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),                        
+                                  child: CachedNetworkImage(
+                                    imageUrl: item['discoverImageUrl'],
+                                    height: 200,
                                     width: double.infinity,
                                     fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) =>
-                                        const Icon(Icons.broken_image),
+                                    placeholder: (context, url) => const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                    errorWidget: (context, url, error) => const Icon(Icons.broken_image),
                                   ),
+                                  // child: Image.network(
+                                  //   item['discoverImageUrl'],
+                                  //   height: 180,
+                                  //   width: double.infinity,
+                                  //   fit: BoxFit.cover,
+                                  //   errorBuilder: (context, error, stackTrace) =>
+                                  //       const Icon(Icons.broken_image),
+                                  // ),
                                 ),
                               Padding(
                                 padding: const EdgeInsets.all(12),
@@ -122,6 +135,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

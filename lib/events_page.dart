@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -101,13 +102,26 @@ class EventCard extends StatelessWidget {
           // Display event cover image
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
-            child: Image.network(
-              event.imageUrl,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Image.asset('assets/images/badminton_tournament.jpg', fit: BoxFit.cover);
-              },
-            ),
+            child: CachedNetworkImage(
+                imageUrl: event.imageUrl,
+                width: double.infinity,
+                height: 240,
+                fit: BoxFit.cover,
+                placeholder: (ctx, url) => Container(
+                  width: double.infinity,
+                  height: 240,
+                  alignment: Alignment.center,
+                  child: const CircularProgressIndicator(strokeWidth: 2),
+                ),
+                errorWidget: (ctx, url, error) => const Icon(Icons.broken_image, size: 50),
+              ),
+            // child: Image.network(
+            //   event.imageUrl,
+            //   fit: BoxFit.cover,
+            //   errorBuilder: (context, error, stackTrace) {
+            //     return Image.asset('assets/images/badminton_tournament.jpg', fit: BoxFit.cover);
+            //   },
+            // ),
           ),
           Padding(
             padding: const EdgeInsets.all(10),
