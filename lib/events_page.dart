@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'event_details_page.dart';
-import 'event_registration_form.dart';
 import 'clubs_page.dart';
 import 'models/event.dart';
 
@@ -76,6 +76,19 @@ class EventCard extends StatelessWidget {
   final String role;
   const EventCard({super.key, required this.event, required this.role});
 
+    Future<void> _launchForm(BuildContext context, String url) async {
+    final uri = Uri.parse(url);
+    final launched = await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
+    if (!launched) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not open the form.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isGuest = role == 'guest';
@@ -135,18 +148,7 @@ class EventCard extends StatelessWidget {
                     ElevatedButton(
                       onPressed: isGuest
                           ? null
-                          : () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      EventRegistrationForm(
-                                        eventTitle: event.title,
-                                        onRegistered: () {},
-                                      ),
-                                ),
-                              );
-                            },
+                          : () => _launchForm(context, event.googleFormLink),
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
                             isGuest ? Colors.grey : null,

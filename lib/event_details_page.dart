@@ -1,11 +1,24 @@
 import 'package:flutter/material.dart';
 import 'models/event.dart';
-import 'event_registration_form.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class EventDetailsPage extends StatelessWidget {
   final Event event;
   final String role;
   const EventDetailsPage({super.key, required this.event, required this.role});
+
+  Future<void> _launchForm(BuildContext context, String url) async {
+    final uri = Uri.parse(url);
+    final launched = await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
+    if (!launched) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not open the form.')),
+      );
+    }
+  }
 
   Widget _buildDetailRow(IconData icon, String label, String value) {
     return Padding(
@@ -81,19 +94,7 @@ class EventDetailsPage extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: isGuest
                   ? null
-                  : () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EventRegistrationForm(
-                          eventTitle: event.title,
-                          onRegistered: () {
-                            // Optionally update registration status in the app
-                          },
-                        ),
-                      ),
-                    );
-                  },
+                  : () => _launchForm(context, event.googleFormLink),
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
                         isGuest ? Colors.grey : Theme.of(context).primaryColor,
