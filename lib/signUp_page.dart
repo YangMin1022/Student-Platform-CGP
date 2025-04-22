@@ -22,6 +22,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   final _formKey = GlobalKey<FormState>();
   bool isLoading = false;
+  bool _obscurePassword = true;
 
   // Determine user role based on email
   String _determineRole(String email) {
@@ -38,7 +39,7 @@ class _SignUpPageState extends State<SignUpPage> {
     // Check if the email ends with the required domain
     if (!emailController.text.toLowerCase().endsWith("@peninsulamalaysia.edu.my")) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please use your @peninsulamalaysia.edu.my email.")),
+        SnackBar(content: Text("Please use your Peninsula school email.")),
       );
       return;
     }
@@ -92,7 +93,8 @@ class _SignUpPageState extends State<SignUpPage> {
     required String title,
     required String hintText,
     required TextEditingController controller,
-    bool obscureText = false,
+    // bool obscureText = false,
+    bool isPassword = false,
     TextInputType keyboardType = TextInputType.text,
   }) {
     return Padding(
@@ -104,7 +106,7 @@ class _SignUpPageState extends State<SignUpPage> {
           SizedBox(height: 10),
           TextFormField(
             controller: controller,
-            obscureText: obscureText,
+            obscureText: isPassword ? _obscurePassword : false,
             keyboardType: keyboardType,
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -121,6 +123,18 @@ class _SignUpPageState extends State<SignUpPage> {
               focusedBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: Colors.blue),
               ),
+              // only show the eye icon on the password field:
+              suffixIcon: isPassword
+                  ? IconButton(
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                      ),
+                      onPressed: () =>
+                          setState(() => _obscurePassword = !_obscurePassword),
+                    )
+                  : null,
             ),
           ),
         ],
@@ -141,9 +155,7 @@ class _SignUpPageState extends State<SignUpPage> {
               color: Colors.blue[100],
               padding: EdgeInsets.symmetric(vertical: 20),
               child: Center(
-                child: Text(
-                  'SIGN UP',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                child: Text('SIGN UP', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
                 ),
               ),
             ),
@@ -163,7 +175,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     _buildInputField(title: 'Student ID', hintText: 'e.g., S12345678', controller: studentIdController),
                     _buildInputField(title: 'Student Phone Number', hintText: 'e.g., 012-3456789', controller: phoneController, keyboardType: TextInputType.phone),
                     _buildInputField(title: 'Student Email Address', hintText: 'e.g., john.doe@peninsulamalaysia.edu.my', controller: emailController, keyboardType: TextInputType.emailAddress),
-                    _buildInputField(title: 'Password', hintText: '********', controller: passwordController, obscureText: true),
+                    _buildInputField(title: 'Password', hintText: '********', controller: passwordController, isPassword: true,),
                     SizedBox(height: 30),
                     // Sign Up button
                     Padding(

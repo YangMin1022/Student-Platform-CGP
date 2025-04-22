@@ -19,6 +19,7 @@ class _SignInPageState extends State<SignInPage> {
   final TextEditingController passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool isLoading = false;
+  bool _obscurePassword = true;
 
   Future<void> signIn() async {
     if (!_formKey.currentState!.validate()) return;
@@ -26,7 +27,7 @@ class _SignInPageState extends State<SignInPage> {
     // Check for the required email domain
     if (!emailController.text.toLowerCase().endsWith("@peninsulamalaysia.edu.my")) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please use your @peninsulamalaysia.edu.my email.")),
+        SnackBar(content: Text("Please use your Peninsula school email.")),
       );
       return;
     }
@@ -52,11 +53,11 @@ class _SignInPageState extends State<SignInPage> {
       String role = userDoc.get('role') as String;
 
       // Navigate to EventsPage, passing the isAdmin flag
-      Navigator.pushReplacement(
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder: (context) => EventsPage(role: role),
-        ),
+          builder: (context) => EventsPage(role: role)),
+          (route) => false,
       );
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -73,7 +74,8 @@ class _SignInPageState extends State<SignInPage> {
     required String title,
     required String hintText,
     required TextEditingController controller,
-    bool obscureText = false,
+    // bool obscureText = false,
+    bool isPassword = false,
     TextInputType keyboardType = TextInputType.text,
   }) {
     return Padding(
@@ -85,7 +87,7 @@ class _SignInPageState extends State<SignInPage> {
           SizedBox(height: 10),
           TextFormField(
             controller: controller,
-            obscureText: obscureText,
+            obscureText: isPassword ? _obscurePassword : false,
             keyboardType: keyboardType,
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -96,12 +98,20 @@ class _SignInPageState extends State<SignInPage> {
             decoration: InputDecoration(
               hintText: hintText,
               hintStyle: TextStyle(color: Colors.grey),
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.blue),
-              ),
+              enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
+              focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.blue)),
+              // only show the eye icon on the password field:
+              suffixIcon: isPassword
+                  ? IconButton(
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                      ),
+                      onPressed: () =>
+                          setState(() => _obscurePassword = !_obscurePassword),
+                    )
+                  : null,
             ),
           ),
         ],
@@ -134,6 +144,7 @@ class _SignInPageState extends State<SignInPage> {
                     SizedBox(height: 5),
                     Text('Student Engagement App', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
                     SizedBox(height: 40),
+                    //Email
                     _buildInputField(
                       title: 'Student Email Address',
                       hintText: 'xxxxxxxxxxx@peninsulamalaysia.edu.my',
@@ -141,11 +152,12 @@ class _SignInPageState extends State<SignInPage> {
                       keyboardType: TextInputType.emailAddress,
                     ),
                     SizedBox(height: 20),
+                    //Password
                     _buildInputField(
                       title: 'Password',
                       hintText: 'eg: ********',
                       controller: passwordController,
-                      obscureText: true,
+                      isPassword: true,
                     ),
                     SizedBox(height: 30),
                     Padding(
@@ -189,11 +201,11 @@ class _SignInPageState extends State<SignInPage> {
                           // ←–– New guest link below
                           TextButton(
                             onPressed: () {
-                              Navigator.pushReplacement(
+                              Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => EventsPage(role: 'guest'),
-                                ),
+                                  builder: (_) => EventsPage(role: 'guest')),
+                                  (route) => false,
                               );
                             },
                             child: Text('Continue as Guest', style: TextStyle(fontSize: 16, decoration: TextDecoration.underline, color: Colors.grey[700]),

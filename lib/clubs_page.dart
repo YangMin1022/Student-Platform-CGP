@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'signIn_page.dart'; // Import Sign In Page
 import 'discover_page.dart'; // Import Discover Page
 import 'club_details_page.dart'; // Import Club Details Page
 import 'admin_page.dart';
@@ -9,6 +10,7 @@ import 'signedInEvent_page.dart';
 import 'club_registration_form.dart'; // Import Club Registration Page
 import 'club_members_page.dart';
 import 'edit_club_page.dart';
+import 'profile_page.dart';
 
 class ClubsPage extends StatefulWidget {
   final String role; // Role of the user (admin or non-admin)
@@ -66,8 +68,25 @@ class _ClubsPageState extends State<ClubsPage> {
           style: TextStyle(
               color: Colors.black, fontSize: 22, fontWeight: FontWeight.bold),
         ),
-        actions: const [
-          Icon(Icons.account_circle, color: Colors.black, size: 30),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.account_circle, color: Colors.black, size: 30),
+            onPressed: () {
+              if (widget.role == 'guest') {
+                // guests go back to sign-in
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => SignInPage()),
+                );
+              } else {
+                // signed‑in users go to their profile
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => ProfilePage()),
+                );
+              }
+            },
+          )
         ],
       ),
       body: IndexedStack(
