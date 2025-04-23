@@ -59,9 +59,9 @@ Once these files are added locally, run the app to ensure proper configuration.
    flutter run
 
 
-- **Debug (Android emulator or connected device)**
+- **Release build (Android APK)**
    ```bash
-   flutter run
+   flutter build apk --release
 
 
 --- 
@@ -77,3 +77,13 @@ We enforce:
 - Admins & club presidents may create/update/delete their own events/discover.
 
 Rules live in `firestore.rules`.
+
+## 🧪 Testing
+
+**Firebase Test Lab (Android):**
+
+1. Generate an unsigned APK:
+   ```bash
+   flutter build apk --debug
+
+2. Upload to Firebase Console → Test Lab.
