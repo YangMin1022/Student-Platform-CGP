@@ -1,10 +1,12 @@
 buildscript {
+    ext.kotlin_version = '2.1.10'
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
         // ...
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.google.gms:google-services:4.4.2' // check for the latest version
     }
 }
@@ -29,4 +31,4 @@ tasks.register("clean", Delete) {
 }
 
 // ext.kotlin_version = '<latest-version>' 
-ext.kotlin_version = '2.1.10' // check for the latest version
+// ext.kotlin_version = '2.1.10' // check for the latest version

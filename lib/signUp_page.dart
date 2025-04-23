@@ -72,11 +72,11 @@ class _SignUpPageState extends State<SignUpPage> {
       } else {
         roles = "student";
       }
-      Navigator.pushReplacement(
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder: (context) => EventsPage(role: roles),
-        ),
+          builder: (context) => EventsPage(role: roles)),
+          (route) => false, // drop everything else in the stack
       );
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
