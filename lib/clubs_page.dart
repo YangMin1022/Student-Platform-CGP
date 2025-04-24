@@ -313,8 +313,8 @@ class _ClubsPageState extends State<ClubsPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     TextButton.icon(
-                      icon: const Icon(Icons.group),
-                      label: const Text("View Members"),
+                      icon: const Icon(Icons.group, color: Colors.blue),
+                      label: const Text("View Members", style: TextStyle(color: Colors.blue)),
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -326,8 +326,8 @@ class _ClubsPageState extends State<ClubsPage> {
                     ),
 
                     TextButton.icon(
-                      icon: const Icon(Icons.edit),
-                      label: const Text("Edit"),
+                      icon: const Icon(Icons.edit, color: Colors.blue),
+                      label: const Text("Edit", style: TextStyle(color: Colors.blue)),
                       onPressed: () {
                         Navigator.push(
                           context,

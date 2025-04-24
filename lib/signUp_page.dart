@@ -174,7 +174,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     _buildInputField(title: 'Student Name', hintText: 'e.g., John Doe', controller: nameController),
                     _buildInputField(title: 'Student ID', hintText: 'e.g., S12345678', controller: studentIdController),
                     _buildInputField(title: 'Student Phone Number', hintText: 'e.g., 012-3456789', controller: phoneController, keyboardType: TextInputType.phone),
-                    _buildInputField(title: 'Student Email Address', hintText: 'e.g., john.doe@peninsulamalaysia.edu.my', controller: emailController, keyboardType: TextInputType.emailAddress),
+                    _buildInputField(title: 'Student Email Address', hintText: 'Peninsula school email', controller: emailController, keyboardType: TextInputType.emailAddress),
                     _buildInputField(title: 'Password', hintText: '********', controller: passwordController, isPassword: true,),
                     SizedBox(height: 30),
                     // Sign Up button

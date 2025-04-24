@@ -43,7 +43,7 @@ class ClubMembersPage extends StatelessWidget {
                 title: Text(data['studentName'] ?? '—'),
                 subtitle: Text(
                   '${data['studentEmail'] ?? '—'}\nID: ${data['studentId'] ?? '—'}',
-                  style: const TextStyle(fontSize: 12),
+                  style: const TextStyle(fontSize: 15),
                 ),
                 isThreeLine: true,
               );

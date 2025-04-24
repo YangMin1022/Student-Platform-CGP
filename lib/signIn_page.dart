@@ -147,7 +147,7 @@ class _SignInPageState extends State<SignInPage> {
                     //Email
                     _buildInputField(
                       title: 'Student Email Address',
-                      hintText: 'xxxxxxxxxxx@peninsulamalaysia.edu.my',
+                      hintText: 'Peninsula school email',
                       controller: emailController,
                       keyboardType: TextInputType.emailAddress,
                     ),
