@@ -1,13 +1,22 @@
-// lib/signedInevent_page.dart
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'models/event.dart';               // <- import the model
 import 'event_details_page.dart';
 import 'edit_event_page.dart';
+
+final _lowMemCache = CacheManager(
+  Config(
+    'lowMemKey',
+    stalePeriod: const Duration(days: 7),
+    maxNrOfCacheObjects: 20,        // only 20 files on disk
+    repo: JsonCacheInfoRepository(databaseName: 'lowMemCache'),
+    fileService: HttpFileService(),
+  ),
+);
 
 class SignedInEventsPage extends StatefulWidget {
   final String role;
@@ -113,7 +122,9 @@ class EventCard extends StatelessWidget {
               child: CachedNetworkImage(
                 imageUrl: event.imageUrl,
                 width: double.infinity,
-                height: 240,
+                cacheManager: _lowMemCache,
+                memCacheWidth: 400,
+                memCacheHeight: 240,
                 fit: BoxFit.cover,
                 placeholder: (ctx, url) => Container(
                   width: double.infinity,
@@ -123,13 +134,6 @@ class EventCard extends StatelessWidget {
                 ),
                 errorWidget: (ctx, url, error) => const Icon(Icons.broken_image, size: 50),
               ),
-              // child: Image.network(
-              //   event.imageUrl,
-              //   fit: BoxFit.cover,
-              //   errorBuilder: (context, error, stackTrace) {
-              //     return Image.asset('assets/images/badminton_tournament.jpg', fit: BoxFit.cover);
-              //   },
-              // ),
             ),
             Padding(
               padding: const EdgeInsets.all(10),
@@ -179,7 +183,7 @@ class EventCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                                      // Edit button only for admin or club president
+                    // Edit button only for admin or club president
                     if (isAdmin || isClubAdmin) ...[
                       const Divider(),
                       TextButton.icon(

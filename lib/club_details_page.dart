@@ -47,7 +47,6 @@ class ClubDetailsPage extends StatelessWidget {
               ),
               errorWidget: (ctx, url, error) => const Icon(Icons.broken_image, size: 50),
             ),
-            // Image.network(imagePath, width: double.infinity, height: 200, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image, size: 100),),
             const SizedBox(height: 15),
             Text(clubName,
                 style:

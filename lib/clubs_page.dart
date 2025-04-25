@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'signIn_page.dart'; // Import Sign In Page
-import 'discover_page.dart'; // Import Discover Page
-import 'club_details_page.dart'; // Import Club Details Page
+import 'signIn_page.dart';
+import 'discover_page.dart';
+import 'club_details_page.dart';
 import 'admin_page.dart';
 import 'signedInEvent_page.dart';
-import 'club_registration_form.dart'; // Import Club Registration Page
+import 'club_registration_form.dart';
 import 'club_members_page.dart';
 import 'edit_club_page.dart';
 import 'profile_page.dart';
@@ -222,7 +222,6 @@ class _ClubsPageState extends State<ClubsPage> {
               ),
               errorWidget: (ctx, url, error) => const Icon(Icons.broken_image, size: 50),
             ),
-            // Image.network(imagePath, width: double.infinity, height: 150, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),),
           ),
           Padding(
             padding: const EdgeInsets.all(10),
