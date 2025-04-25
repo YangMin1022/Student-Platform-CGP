@@ -79,7 +79,7 @@ class _ClubRegistrationPageState extends State<ClubRegistrationPage> {
               _buildField('Student ID', _idCtrl),
               const SizedBox(height: 12),
               _buildField('Student Email', _emailCtrl,
-                  keyboard: TextInputType.emailAddress),
+                  keyboard: TextInputType.emailAddress, isEmail: true,),
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
@@ -106,7 +106,7 @@ class _ClubRegistrationPageState extends State<ClubRegistrationPage> {
   }
 
   Widget _buildField(String label, TextEditingController ctrl,
-      {TextInputType keyboard = TextInputType.text}) {
+      {TextInputType keyboard = TextInputType.text, bool isEmail = false,}) {
     return TextFormField(
       controller: ctrl,
       keyboardType: keyboard,
@@ -115,8 +115,18 @@ class _ClubRegistrationPageState extends State<ClubRegistrationPage> {
         hintText: 'eg: ${label.split(' ').last}...',
         border: const UnderlineInputBorder(),
       ),
-      validator: (v) =>
-          v == null || v.trim().isEmpty ? 'Please enter $label' : null,
+      validator: (v) {
+        if (v == null || v.trim().isEmpty) {
+          return 'Please enter $label';
+        }
+        if (isEmail) {
+          final email = v.trim().toLowerCase();
+          if (!email.endsWith('@peninsulamalaysia.edu.my')) {
+            return 'Please use your Peninsula email address';
+          }
+        }
+        return null;
+      },
     );
   }
 }

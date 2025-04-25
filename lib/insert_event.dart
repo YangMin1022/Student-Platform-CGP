@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -211,10 +212,21 @@ class _InsertEventPageState extends State<InsertEventPage> {
       padding: const EdgeInsets.only(bottom: 16),
       child: TextFormField(
         controller: controller,
-        keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
+        keyboardType: isNumeric 
+          ? const TextInputType.numberWithOptions(signed: false, decimal: false)
+          : TextInputType.text,
+        // ONLY allow digits when isNumeric:
+        inputFormatters: isNumeric
+          ? <TextInputFormatter>[
+              FilteringTextInputFormatter.digitsOnly
+            ]
+          : null,
         validator: (value) {
           if (value == null || value.isEmpty) {
             return 'Please enter $label';
+          }
+          if (isNumeric && int.tryParse(value) == null) {
+            return '$label must be a number';
           }
           return null;
         },
