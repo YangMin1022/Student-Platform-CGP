@@ -115,13 +115,6 @@ class EventCard extends StatelessWidget {
                 ),
                 errorWidget: (ctx, url, error) => const Icon(Icons.broken_image, size: 50),
               ),
-            // child: Image.network(
-            //   event.imageUrl,
-            //   fit: BoxFit.cover,
-            //   errorBuilder: (context, error, stackTrace) {
-            //     return Image.asset('assets/images/badminton_tournament.jpg', fit: BoxFit.cover);
-            //   },
-            // ),
           ),
           Padding(
             padding: const EdgeInsets.all(10),

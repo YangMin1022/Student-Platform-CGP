@@ -146,6 +146,23 @@ class _InsertEventPageState extends State<InsertEventPage> {
     }
   }
 
+  @override
+  void dispose() {
+    _eventNameController.dispose();
+    _eventOrganizerController.dispose();
+    _eventVenueController.dispose();
+    _eventDateController.dispose();
+    _eventTimeController.dispose();
+    _eventCategoryController.dispose();
+    _eventFeeController.dispose();
+    _eventDescriptionController.dispose();
+    _eventTransportationController.dispose();
+    _numParticipantsController.dispose();
+    _eventCoverPicController.dispose();
+    _googleFormLinkController.dispose();
+    super.dispose();
+  }
+
    Widget _buildClubDropdown() {
     return DropdownButtonFormField<String>(
       decoration: InputDecoration(
